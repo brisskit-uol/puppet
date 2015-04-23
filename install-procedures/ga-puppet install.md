@@ -3,7 +3,7 @@
 ### Provision VM in Azure ###
 * Provision from gallery: _Ubuntu 14.04 LTS_
 * Machine name: _ga-puppet_
-* Machine size: _A1_ (to be performance tested and altered as necessary)
+* Machine size: _A2_ (to be performance tested and altered as necessary)
 * Username: _azureuser_
 * Password: from password database (until managed by Puppet itself)
 * Cloud Service: _ga-brisskit_
@@ -13,8 +13,8 @@
 * Endpoints
 	* SSH: _10022 => 22_
 
-### Install Puppet Master ###
-* Upload _1_install_puppetmaster.sh_ to server
+### Install Puppet server ###
+* Upload _1_install_puppetserver.sh_ to server
 * Set execute permissions on _1_install_puppetmaster.sh_ using `chmod u+x 1_install_puppetmaster.sh`
 * Run _./1_install_puppetmaster.sh_
 
