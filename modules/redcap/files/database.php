@@ -22,7 +22,7 @@ $password 	= 'redcappass';
 // Add a random value for the $salt variable below, preferably alpha-numeric with 8 characters or more. This value wll be 
 // used for data de-identification hashing for data exports. Do NOT change this value once it has been initially set.
 
-$salt = '';
+$salt = '05c1b9a199';
 
 
 //********************************************************************************************************************
