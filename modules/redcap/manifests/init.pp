@@ -28,5 +28,10 @@ class redcap {
 		recurse	=> true,
 		require	=> Class['::apache'],
 	}
+	
+	file { '/var/www/html/index.html':
+		ensure	=> absent,
+		require	=> Class['::apache'],
+	}
 
 }
