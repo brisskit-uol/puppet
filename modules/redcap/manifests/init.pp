@@ -14,6 +14,10 @@ class redcap {
 	
 	class { '::mysql::server': }
 	
+	class { '::mysql::bindings': 
+		php_enable	=> true,
+	}
+	
 	::mysql::db { 'redcap':
 		user     => 'redcapuser',
 		password => 'redcappass',
