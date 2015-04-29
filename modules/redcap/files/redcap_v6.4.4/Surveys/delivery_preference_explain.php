@@ -1,0 +1,13 @@
+<?php
+/*****************************************************************************************
+**  REDCap is only available through a license agreement with Vanderbilt University
+******************************************************************************************/
+
+require_once dirname(dirname(__FILE__)) . "/Config/init_project.php";
+$content = 	RCView::div(array('style'=>''),
+				$lang['survey_861']
+			) .
+			RCView::div(array('style'=>''),
+				" &nbsp; &bull; " . implode("<br> &nbsp; &bull; ", Survey::getDeliveryMethods())
+			);
+print json_encode(array('title'=>$lang['survey_687']. " " . $lang['survey_691'], 'content'=>$content));

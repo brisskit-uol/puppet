@@ -1,0 +1,2 @@
+<?phpglobal $post;$query = "SELECT username FROM redcap_user_rights WHERE api_token = '" . $post['token'] . "'";defined("USERID") or define("USERID", db_result(db_query($query), 0));defined("PROJECT_ID") or define("PROJECT_ID", $post['projectid']);// Logginglog_event("", "redcap_config", "MANAGE", PROJECT_ID, "project_id = " . PROJECT_ID, "Export REDCap version (API)");
+// Send the response to the requestorRestUtility::sendResponse(200, $redcap_version, 'csv');
