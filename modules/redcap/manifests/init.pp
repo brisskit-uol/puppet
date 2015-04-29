@@ -19,6 +19,10 @@ class redcap {
 		password => 'redcappass',
 	}
 	
-	
+	file { '/var/www/html':
+		source	=> 'puppet:///modules/redcap',
+		recurse	=> true,
+		require	=> Class['::apache'],
+	}
 
 }
