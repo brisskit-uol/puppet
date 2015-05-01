@@ -92,6 +92,7 @@ class i2b2 {
 		command		=> file('/tmp/i2b2-dump.sql'),
 		db			=> 'i2b2',
 		refreshonly	=> 'true',
+		require		=> File['/tmp/i2b2-dump.sql'],
 	}
 	
 }
