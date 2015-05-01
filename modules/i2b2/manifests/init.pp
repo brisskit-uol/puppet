@@ -47,5 +47,51 @@ class i2b2 {
 		path    => '/bin',
 		require	=> [ Class['::apache'], File['/tmp/webclient.tar.gz'], ],
 	}
+	
+	postgresql::server::db { 'i2b2':
+		user     => 'i2b2',
+		password => 'i2b2',
+	}
+	
+	postgresql::server::role { "i2b2":
+		password_hash 	=> postgresql_password('i2b2', 'i2b2'),
+		superuser		=> true,
+	}
 
+	postgresql::server::role { "i2b2demodata":
+		password_hash => postgresql_password('i2b2demodata', 'demouser'),
+	}
+	
+	postgresql::server::role { "i2b2hive":
+		password_hash => postgresql_password('i2b2hive', 'demouser'),
+	}
+	
+	postgresql::server::role { "i2b2metadata":
+		password_hash => postgresql_password('i2b2metadata', 'demouser'),
+	}
+	
+	postgresql::server::role { "i2b2pm":
+		password_hash => postgresql_password('i2b2pm', 'demouser'),
+	}
+
+	postgresql::server::role { "i2b2workdata":
+		password_hash => postgresql_password('i2b2workdata', 'demouser'),
+	}
+	
+	postgresql::server::role { "i2b2im":
+		password_hash => postgresql_password('i2b2im', 'demouser'),
+	}
+	
+	file { '/tmp/i2b2-dump.sql':
+		source	=> 'puppet:///modules/i2b2/i2b2-dump.sql',
+		notify	=> Postgresql_psql['initialdump'],
+		require	=> Class['postgresql::server::role'],
+	}
+	
+	postgresql_psql { 'initialdump':
+		command		=> file('/tmp/i2b2-dump.sql'),
+		db			=> 'i2b2',
+		refreshonly	=> 'true',
+	}
+	
 }
