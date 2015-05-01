@@ -10,7 +10,7 @@ class i2b2 {
 		require		=> Class['::ruby'],
 	}
 	
-	file { '/var/local/brisskit/i2b2':
+	file { [ '/var', '/var/local', '/var/local/brisskit', '/var/local/brisskit/i2b2', ]:
 		ensure	=> directory,
 	}
 	
