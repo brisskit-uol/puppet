@@ -48,6 +48,8 @@ class i2b2 {
 		require	=> [ Class['::apache'], File['/tmp/webclient.tar.gz'], ],
 	}
 	
+	class { "postgresql::server": }
+	
 	postgresql::server::db { 'i2b2':
 		user     => 'i2b2',
 		password => 'i2b2',
@@ -84,15 +86,15 @@ class i2b2 {
 	
 	file { '/tmp/i2b2-dump.sql':
 		source	=> 'puppet:///modules/i2b2/i2b2-dump.sql',
-		notify	=> Postgresql_psql['initialdump'],
-		require	=> Class['postgresql::server::role'],
+		notify	=> Exec['initialdump'],
+		require	=> Postgresql::Server::Db['i2b2'],
 	}
 	
-	postgresql_psql { 'initialdump':
-		command		=> file('/tmp/i2b2-dump.sql'),
-		db			=> 'i2b2',
-		refreshonly	=> 'true',
-		require		=> File['/tmp/i2b2-dump.sql'],
+	exec { 'initialdump':
+		command		=> 'sudo -u postgres psql -d i2b2 -f /tmp/i2b2-dump.sql && touch /tmp/.dbimport',
+		path		=> ['/bin', '/usr/bin'],
+		refreshonly	=> true,
+		creates		=> '/tmp/.dbimport',
 	}
 	
 }
