@@ -10,6 +10,8 @@ class i2b2 {
 		require		=> Class['::ruby'],
 	}
 	
+	class { '::apache::mod::php': }
+	
 	file { [ '/var', '/var/local', '/var/local/brisskit', '/var/local/brisskit/i2b2', ]:
 		ensure	=> directory,
 	}
@@ -34,17 +36,17 @@ class i2b2 {
 		source	=> 'puppet:///modules/i2b2/webclient.tar.gz',
 	}
 	
-	exec { "tar -xf /tmp/jdk1.7.0_17.tar.gz -C /var/local/brisskit/i2b2/":
+	exec { "sudo tar -xf /tmp/jdk1.7.0_17.tar.gz -C /var/local/brisskit/i2b2/":
 		cwd     => "/var/local/brisskit/i2b2",
 		creates => "/var/local/brisskit/i2b2/jdk1.7.0_17",
-		path    => '/bin',
+		path    => [ '/bin', '/usr/bin', ],
 		require	=> [ File['/var/local/brisskit/i2b2'], File['/tmp/jdk1.7.0_17.tar.gz'], ],
 	}
 	
-	exec { "tar -xf /tmp/webclient.tar.gz -C /var/www/html":
+	exec { "sudo tar -xf /tmp/webclient.tar.gz -C /var/www/html":
 		cwd     => "/var/www/html",
 		creates => "/var/www/html/i2b2",
-		path    => '/bin',
+		path    => [ '/bin', '/usr/bin', ],
 		require	=> [ Class['::apache'], File['/tmp/webclient.tar.gz'], ],
 	}
 	
