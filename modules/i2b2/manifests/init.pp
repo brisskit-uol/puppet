@@ -12,6 +12,11 @@ class i2b2 {
 	
 	class { '::apache::mod::php': }
 	
+	package { 'php5-curl':
+		ensure	=> present,
+		require	=> Class['::apache::mod::php'],
+	}
+	
 	file { [ '/var', '/var/local', '/var/local/brisskit', '/var/local/brisskit/i2b2', ]:
 		ensure	=> directory,
 	}
@@ -61,29 +66,78 @@ class i2b2 {
 		password_hash 	=> postgresql_password('i2b2', 'i2b2'),
 		superuser		=> true,
 	}
-
+	
+	postgresql::server::database_grant { "grant-i2b2":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2',
+		require		=> Postgresql::Server::Role['i2b2'],
+	}
+		
 	postgresql::server::role { "i2b2demodata":
 		password_hash => postgresql_password('i2b2demodata', 'demouser'),
 	}
-	
+
+	postgresql::server::database_grant { "grant-i2b2demodata":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2demodata',
+		require		=> Postgresql::Server::Role['i2b2demodata'],
+	}
+		
 	postgresql::server::role { "i2b2hive":
 		password_hash => postgresql_password('i2b2hive', 'demouser'),
 	}
-	
+
+	postgresql::server::database_grant { "grant-i2b2hive":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2hive',
+		require		=> Postgresql::Server::Role['i2b2hive'],
+	}
+		
 	postgresql::server::role { "i2b2metadata":
 		password_hash => postgresql_password('i2b2metadata', 'demouser'),
 	}
-	
+
+	postgresql::server::database_grant { "grant-i2b2metadata":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2metadata',
+		require		=> Postgresql::Server::Role['i2b2metadata'],
+	}
+		
 	postgresql::server::role { "i2b2pm":
 		password_hash => postgresql_password('i2b2pm', 'demouser'),
 	}
 
+	postgresql::server::database_grant { "grant-i2b2pm":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2pm',
+		require		=> Postgresql::Server::Role['i2b2pm'],
+	}
+	
 	postgresql::server::role { "i2b2workdata":
 		password_hash => postgresql_password('i2b2workdata', 'demouser'),
 	}
-	
+
+	postgresql::server::database_grant { "grant-i2b2workdata":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2workdata',
+		require		=> Postgresql::Server::Role['i2b2workdata'],
+	}
+		
 	postgresql::server::role { "i2b2im":
 		password_hash => postgresql_password('i2b2im', 'demouser'),
+	}
+	
+	postgresql::server::database_grant { "grant-i2b2im":
+		privilege	=> 'CONNECT',
+		db			=> 'i2b2',
+		role		=> 'i2b2im',
+		require		=> Postgresql::Server::Role['i2b2im'],
 	}
 	
 	file { '/tmp/i2b2-dump.sql':
