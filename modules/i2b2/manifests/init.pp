@@ -35,6 +35,7 @@ class i2b2 {
 	file { '/var/local/brisskit/i2b2/jboss-as-7.1.1.Final':
 		source	=> 'puppet:///modules/i2b2/jboss-as-7.1.1.Final',
 		recurse	=> true,
+		replace	=> false,
 		require	=> File['/var/local/brisskit/i2b2'],
 	}
 	
