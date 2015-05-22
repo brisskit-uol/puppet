@@ -41,14 +41,16 @@ class i2b2 {
 		source	=> 'puppet:///modules/i2b2/webclient.tar.gz',
 	}
 	
-	exec { "sudo tar -xf /tmp/jdk1.7.0_17.tar.gz -C /var/local/brisskit/i2b2/":
+	exec { "extract-jdk":
+		command	=> "sudo tar -xf /tmp/jdk1.7.0_17.tar.gz -C /var/local/brisskit/i2b2/",
 		cwd     => "/var/local/brisskit/i2b2",
 		creates => "/var/local/brisskit/i2b2/jdk1.7.0_17",
 		path    => [ '/bin', '/usr/bin', ],
 		require	=> [ File['/var/local/brisskit/i2b2'], File['/tmp/jdk1.7.0_17.tar.gz'], ],
 	}
 	
-	exec { "sudo tar -xf /tmp/webclient.tar.gz -C /var/www/html":
+	exec { "extract-webclient":
+		command	=> "sudo tar -xf /tmp/webclient.tar.gz -C /var/www/html",
 		cwd     => "/var/www/html",
 		creates => "/var/www/html/i2b2",
 		path    => [ '/bin', '/usr/bin', ],
@@ -58,11 +60,13 @@ class i2b2 {
 	file { '/var/local/brisskit/i2b2/jboss':
 		ensure	=> link,
 		target	=> 'jboss-as-7.1.1.Final',
+		require	=> File['/var/local/brisskit/i2b2/jboss-as-7.1.1.Final'],
 	}
 	
 	file { '/var/local/brisskit/i2b2/jdk':
 		ensure	=> link,
 		target	=> 'jdk1.7.0_17',
+		require	=> Exec['extract-jdk'],
 	}
 	
 	class { "postgresql::server": }
