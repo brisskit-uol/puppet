@@ -27,6 +27,11 @@ class i2b2 {
 		require	=> File['/var/local/brisskit/i2b2'],
 	}
 	
+	file { '/var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/utility/startjboss.sh':
+		mode	=> 'u+x',
+		require	=> File['/var/local/brisskit/i2b2/i2b2-1.7-install-procedures'],
+	}
+	
 	file { '/var/local/brisskit/i2b2/jboss-as-7.1.1.Final':
 		source	=> 'puppet:///modules/i2b2/jboss-as-7.1.1.Final',
 		recurse	=> true,
@@ -62,7 +67,12 @@ class i2b2 {
 		target	=> 'jboss-as-7.1.1.Final',
 		require	=> File['/var/local/brisskit/i2b2/jboss-as-7.1.1.Final'],
 	}
-	
+
+	file { '/var/local/brisskit/i2b2/jboss/bin/standalone.sh':
+		mode	=> 'u+x',
+		require	=> File['/var/local/brisskit/i2b2/jboss'],
+	}
+		
 	file { '/var/local/brisskit/i2b2/jdk':
 		ensure	=> link,
 		target	=> 'jdk1.7.0_17',
@@ -171,6 +181,7 @@ class i2b2 {
 		command	=> 'bash -c "source /var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/global/set.sh && sudo -E /var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/utility/startjboss.sh"',
 		path	=> ['/usr/bin', '/bin',],
 		unless	=> 'ps -o pid --no-headers --ppid $(ps -C standalone.sh -o pid --no-headers) 2>/dev/null',
+		require	=> [ File['/var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/utility/startjboss.sh'], File['/var/local/brisskit/i2b2/jboss/bin/standalone.sh'], ],
 	}
 	
 }
