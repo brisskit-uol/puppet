@@ -55,6 +55,16 @@ class i2b2 {
 		require	=> [ Class['::apache'], File['/tmp/webclient.tar.gz'], ],
 	}
 	
+	file { '/var/local/brisskit/i2b2/jboss':
+		ensure	=> link,
+		target	=> 'jboss-as-7.1.1.Final',
+	}
+	
+	file { '/var/local/brisskit/i2b2/jdk':
+		ensure	=> link,
+		target	=> 'jdk1.7.0_17',
+	}
+	
 	class { "postgresql::server": }
 	
 	postgresql::server::db { 'i2b2':
@@ -151,6 +161,12 @@ class i2b2 {
 		path		=> ['/bin', '/usr/bin'],
 		refreshonly	=> true,
 		creates		=> '/tmp/.dbimport',
+	}
+	
+	exec { 'startjboss':
+		command	=> 'bash -c "source /var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/global/set.sh && sudo -E /var/local/brisskit/i2b2/i2b2-1.7-install-procedures/bin/utility/startjboss.sh"',
+		path	=> ['/usr/bin', '/bin',],
+		unless	=> 'ps -o pid --no-headers --ppid $(ps -C standalone.sh -o pid --no-headers) 2>/dev/null',
 	}
 	
 }
