@@ -5,9 +5,16 @@ class i2b2 {
 	}
 	
 	class { '::apache': 
+		default_vhost	=> false,
+		mpm_module		=> 'prefork',
+		require			=> Class['::ruby'],
+	}
+	
+	::apache::vhost { 'i2b2':
+		servername	=> 'default',
 		docroot		=> '/var/www/html',
-		mpm_module	=> 'prefork',
-		require		=> Class['::ruby'],
+		port		=> '80',
+		proxy_pass	=> [ { 'path' => '/i2b2UploaderWebapp', 'url' => 'http://localhost:9090/i2b2UploaderWebapp', }, ],
 	}
 	
 	class { '::apache::mod::php': }
