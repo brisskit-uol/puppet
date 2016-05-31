@@ -1,4 +1,4 @@
-# Puppet #
+# Puppet v2 #
 
 ### Provision VM in Azure ###
 * Provision from gallery: _Ubuntu 14.04 LTS_

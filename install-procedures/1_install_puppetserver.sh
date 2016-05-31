@@ -1,6 +1,6 @@
 #!/bin/bash
 #===========================================================================================#
-# Installs Puppet Server																	#
+# Installs Puppet Server v2																	#
 #===========================================================================================#
 
 # Set a location to be used for temporary files and logs
