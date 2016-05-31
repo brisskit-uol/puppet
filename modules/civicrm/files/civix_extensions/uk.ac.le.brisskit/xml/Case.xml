@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<menu>
+  <item>
+     <path>civicrm/recruitment</path>
+     <title>CiviRecruitment Dashboard</title>
+     <page_callback>CRM_Case_Page_DashBoard</page_callback>
+     <page_type>1</page_type>
+     <weight>1900</weight>
+     <component>CiviCase</component>
+  </item>
+  <item>
+     <path>civicrm/recruitment/add</path>
+     <title>Open Case</title>
+     <page_callback>CRM_Case_Form_Case</page_callback>
+     <page_type>1</page_type>
+     <component>CiviCase</component>
+  </item>
+  <item> 
+     <path>civicrm/recruitment/search</path>
+     <title>Find Recruitments</title>
+     <page_callback>CRM_Case_Controller_Search</page_callback>
+     <page_type>1</page_type>
+     <weight>1910</weight>
+  </item>
+  <item>
+     <path>civicrm/study</path>
+     <title>CiviStudy Dashboard</title>
+     <page_callback>CRM_Case_Page_DashBoard</page_callback>
+     <page_type>1</page_type>
+     <weight>900</weight>
+     <component>CiviCase</component>
+  </item>
+  <item>
+     <path>civicrm/study/add</path>
+     <title>Open Case</title>
+     <page_callback>CRM_Case_Form_Case</page_callback>
+     <page_type>1</page_type>
+     <component>CiviCase</component>
+  </item>
+  <item>
+     <path>civicrm/study/search</path>
+     <title>Find Studies</title>
+     <page_callback>CRM_Case_Controller_Search</page_callback>
+     <page_type>1</page_type>
+     <weight>910</weight>
+  </item>
+
+</menu>
+

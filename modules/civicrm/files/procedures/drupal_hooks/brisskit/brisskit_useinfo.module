@@ -1,0 +1,53 @@
+<?php
+
+define('USEINFO_CONSENT','Consent to use information');
+
+function brisskit_useinfo_letter_response($params) {
+	$case_id = $params['case_id'];
+	
+	$params = array(
+		'case_id' => $params['case_id'],
+		'activity_type' => USEINFO_CONSENT, 
+		'subject' => POSITIVE_REPLY_SUBJECT, 
+		'status' => ACT_STATUS_PENDING,
+		'creator_id' => $params['source_contact_id']
+	);
+	add_activity_to_case($params);
+	drupal_set_message("'".USEINFO_CONSENT."' activity added to case");
+	return true;
+}
+
+#hook run when consent set to 'Accepted' to use information
+function brisskit_useinfo_consent_success($activity_type,$params) {
+	# 3. scheduled ÔBRISSkit data transferÕ to integrate with i2b2
+  # and onyx
+	if ($activity_type == USEINFO_CONSENT) { 
+		$case_id = $params['case_id'];
+		$case_contact = get_case_contact_with_custom_values($case_id);
+		$contact = get_contact($case_contact['contact_id']);
+		
+		drupal_set_message("Data transfer to i2b2 is pending");
+		$params = array(
+			'case_id' => $params['case_id'],
+			'activity_type'=>ACTIVITY_DATA_TRANSFER,
+			'subject' => "Transfer to i2b2",
+			'status' => "Scheduled",
+			'creator_id' => $params['source_contact_id']
+		);
+
+		add_activity_to_case($params);
+
+		drupal_set_message("Data transfer to onyx is pending");
+		$params = array(
+			'case_id' => $params['case_id'],
+			'activity_type'=>ACTIVITY_DATA_TRANSFER,
+			'subject' => "Transfer to onyx",
+			'status' => "Scheduled",
+			'creator_id' => $params['source_contact_id']
+		);
+
+		add_activity_to_case($params);
+		return true;
+	}
+	
+}

@@ -1,0 +1,1 @@
+* * * * * /bin/bash ~/bk_cron/test_cron.sh >> ~/bk_cron/cron.log

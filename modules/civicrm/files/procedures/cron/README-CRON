@@ -1,0 +1,4 @@
+#============================================================================#
+# You will find the scheduleTransfer.sh script quoted in the crontab         #
+# within the drupal_hooks/brisskit/bin directory of this project.            #
+#============================================================================#

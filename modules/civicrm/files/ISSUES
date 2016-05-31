@@ -1,0 +1,20 @@
+Important issues
+================
+
+31/12/15
+There is a problem adding studies affecting some installs, related to setting the component id used by mysql to retrieve the coprrect component. It's possible it's not always set - perhaps it should default? All is ok on the installation of Azure, but it seems to affect some new Ubuntu VM installations. If possible create script that can identify when this issue is present. Longer term we should perhaps look to replace the mysql view with civicrm hook code (APIWrapper) if this can deal with all use cases.
+
+31/12/15
+Create script to help setting up ACLs from scratch.
+
+Nice to have
+============
+
+31/12/15
+Move functions in BK_Temp to more approprately named classes.
+
+31/12/15
+Load perms and roles for sample data from XML files rather than have hard-coded values in scripts.
+
+31/12/15
+For new install, provide option to configure some civicrm options (e.g. path for templates) without haveing to use GUI.

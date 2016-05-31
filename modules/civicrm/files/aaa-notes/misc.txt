@@ -1,0 +1,4 @@
+The function 
+>brisskit_db_param civicrm pass 
+is located at   
+  https://svn.rcs.le.ac.uk/BRISSkit/repo1/puppet/modules/roles/files/global/

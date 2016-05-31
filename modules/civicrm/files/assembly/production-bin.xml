@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+  <id></id>
+  <formats>
+    <format>zip</format>
+  </formats>
+  <includeBaseDirectory>true</includeBaseDirectory>
+  <dependencySets/>
+  <files>
+  	<file>
+    	<source>procedures/README</source>
+    	<destName>README</destName>	
+    </file>
+  </files>
+  <fileSets> 
+    <fileSet>
+    	<!-- includes  -->
+ 		<directory>${basedir}/procedures/bin</directory> 
+ 		<outputDirectory>bin</outputDirectory>
+ 		<fileMode>0774</fileMode>
+    </fileSet>
+    <fileSet>
+    	<!-- includes  -->
+ 		<directory>${basedir}/procedures/civicases</directory> 
+ 		<outputDirectory>civicases</outputDirectory>
+ 		<fileMode>0774</fileMode>
+    </fileSet>
+    <fileSet>
+    	<!-- includes  -->
+ 		<directory>${basedir}/procedures/cron</directory> 
+ 		<outputDirectory>cron</outputDirectory>
+ 		<fileMode>0774</fileMode>
+    </fileSet>
+    <fileSet>
+    	<!-- includes  -->
+ 		<directory>${basedir}/procedures/hooks</directory> 
+ 		<outputDirectory>hooks</outputDirectory>
+ 		<fileMode>0774</fileMode>
+    </fileSet>
+  </fileSets>
+</assembly>

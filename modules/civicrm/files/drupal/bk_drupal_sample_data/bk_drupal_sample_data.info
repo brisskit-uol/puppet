@@ -1,0 +1,4 @@
+name = Brisskit sample data
+description = Setup/delete users on enable/disable, demonstrating use of roles and permissions for Brisskit.
+core = 7.x
+dependencies[] = bk_role_perms

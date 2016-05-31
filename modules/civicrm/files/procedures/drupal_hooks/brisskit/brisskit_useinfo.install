@@ -1,0 +1,18 @@
+<?php
+include_once "lib/init.php";
+
+/**
+ * Implements hook_enable().
+ */
+
+function brisskit_useinfo_enable() {
+	civicrm_initialize();
+	try {
+                BK_Utils::create_civi_option_value("activity_type", array("name" => USEINFO_CONSENT, "label" => USEINFO_CONSENT, "is_active"=>1));
+                drupal_set_message("BRISSkit participant information extension for CiviCRM was setup successfully");
+        }
+        catch(Exception $ex) {
+                drupal_set_message("An unexpected error occured during the BRISSkit participant information setup: ".$ex->getMessage(),"error");
+        }
+	}
+	

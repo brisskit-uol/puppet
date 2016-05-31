@@ -1,0 +1,7 @@
+
+Files in this directory are used directly from CiviCRM core. i.e. it is necessary to patch CiviCRM for these to be run correctly. They are a functional dependency of the extension.
+
+Currently the code is used to specify a variable used by mysql to detemine whether study cases or recruitment cases are used (via an sql view).
+
+CRM/Core/DAO.php
+

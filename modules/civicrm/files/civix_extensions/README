@@ -1,0 +1,8 @@
+To install the brisskit extension copy the directory(ies) here into the civicrm extensions directory. 
+
+e.g.
+
+sudo mkdir  /var/local/brisskit/drupal/site/civicrm/sites/default/files/civicrm/custom_ext
+sudo cp -rp uk.ac.le.brisskit /var/local/brisskit/drupal/site/civicrm/sites/default/files/civicrm/custom_ext
+
+chgrp www-data /var/local/brisskit/drupal/site/civicrm/sites/default/files/civicrm/custom_ext

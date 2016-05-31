@@ -1,0 +1,10 @@
+*** files/civicrm.settings.php	2015-10-29 14:26:24.372257300 +0000
+--- /var/local/brisskit/drupal/site/civicrm/sites/default/civicrm.settings.php	2015-10-29 14:31:21.900257300 +0000
+***************
+*** 1,2 ****
+--- 1,5 ----
+  <?php
++ 
++ include_once('brisskit_civicrm.settings.php');
++ 
+  /*

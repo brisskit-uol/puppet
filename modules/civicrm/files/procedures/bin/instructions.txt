@@ -1,0 +1,46 @@
+    -------------------------
+    -------------------------
+    Drupal/CiviCRM deployment completed.
+
+    Now you need to use a web browser to visit the site and complete the process.
+
+    To complete the Drupal configuration goto :
+
+        http://192.168.0.18/civicrm/install.php
+
+    To complete the CiviCRM configuration goto :
+
+        http://192.168.0.18/civicrm/sites/all/modules/civicrm/install/index.php
+
+    The CiviCRM configuration page will need the following database settings
+
+        CiviCRM Database Settings
+
+            MySQL server   : localhost
+            MySQL username : civicrm
+            MySQL password : br1ssk1t123
+            MySQL database : civicrm
+
+        Drupal Database Settings
+
+            MySQL server   : localhost
+            MySQL username : drupal
+            MySQL password : br1ssk1t123
+            MySQL database : drupal
+
+    -------------------------
+    -------------------------
+
+    Once you have completed the online configuration,
+    remember to protect the drupal settings.
+
+    chmod 'g-w' "/var/local/brisskit/drupal/site/civicrm/sites/default"
+    chmod 'g-w' "/var/local/brisskit/drupal/site/civicrm/sites/default/settings.php"
+
+    You also need to enable the brisskit module. You need to be in the
+    module directory to do this, so
+
+    cd /var/local/brisskit/drupal/site/civicrm/sites/all/modules
+
+    drush en bk_role_perms,bk_drupal_sample_data
+

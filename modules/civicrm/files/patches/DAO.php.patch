@@ -1,0 +1,9 @@
+*** civicrm/CRM/Core/DAO.php	2015-03-06 03:16:37.000000000 +0000
+--- DAO.php	2015-10-29 15:05:32.072257300 +0000
+***************
+*** 366,367 ****
+--- 366,369 ----
+      $this->query("SET NAMES utf8");
++ 
++     include_once('brisskit_DAO.php');
+    }

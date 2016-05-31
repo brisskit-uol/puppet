@@ -1,0 +1,143 @@
+<!--
+Controller: CaseTypeCtrl
+Required vars: caseType
+
+The original form used table layout; don't know if we have an alternative, CSS-based layout
+-->
+<table class="form-layout">
+  <tbody ng-controller="BKController as BK">
+
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="title">
+        Parent Case Type
+      </label>
+    </td>
+    <td>
+		<select ng-model="selectedItem">
+			<option ng-click="descriptionOn()" value="">Parent Study Type</option>
+			<option ng-click="select(studyType.id + ' ' + studyType.title)"  ng-repeat="studyType in studyTypes" value="{{ studyType.id }}" >{{ studyType.title }}</option>
+		</select>
+
+<script>
+    function BKController($scope) {
+        $scope.contacts = ["hi@email.com", "hello@email.com"];
+ 
+        $scope.add = function() {
+        	$scope.contacts.push($scope.newcontact);
+        	$scope.newcontact = "";
+        }
+
+		$scope.studyTypes = [ ];
+
+		CRM.api3('CaseType', 'get', {
+          "sequential": 1,
+          "description": {"LIKE":"Study Type:%"}
+        }).done(function(result) {
+            result.values.forEach(function(row) {
+                $scope.studyTypes.push( {
+                    id: row.id,
+                    title: row.title
+                } );
+            });
+			$scope.$apply();
+        });
+
+		$scope.select = function(item) {
+			//
+			// The user has identified this Case Type as representing a template for any child studies for the study type
+			//
+			// Get the scope of the main angular controller used by vanilla CiviCRM
+			// We use a bit of jQuery code but it should be OK.
+			//
+			jQuery("textarea[name='description").attr('disabled', 'disabled');
+			var mainScope = angular.element(jQuery("textarea[name='description")).scope();
+			mainScope.caseType.description = 'Template for studies of type #' + item;
+		}
+
+		$scope.descriptionOn = function() {
+			jQuery("textarea[name='description").attr('disabled', '');
+		}
+
+		$scope.zzz = function() {
+			alert ("clicked");
+			jQuery( "textarea[name='description']" ).html('adsadasd');
+		}
+    }
+
+	jQuery( "input[type='submit']" ).click(function() {
+		var mainScope = angular.element(jQuery("textarea[name='description")).scope();
+		alert(mainScope.caseType.description);
+	});
+
+	BKController.prototype.zzz = function() {
+        alert ('zzzz');
+    };
+
+</script>
+		
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="title">
+        Title
+      </label>
+    </td>
+    <td>
+      <input
+        type="text"
+        name="title"
+        ng-model="caseType.title"
+        class="big crm-form-text"
+        required
+        />
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="caseTypeName">
+        Name
+      </label>
+    </td>
+    <td>
+      <input
+        type="text"
+        name="caseTypeName"
+        ng-model="caseType.name"
+        ng-disabled="locks.caseTypeName"
+        required
+        class="big crm-form-text"/>
+
+      <a crm-ui-lock binding="locks.caseTypeName"></a>
+
+      <div ng-show="!isValidName(caseType.name)">
+        <em>WARNING: The case type name includes deprecated characters.</em>
+      </div>
+      <div ng-show="caseType.id && !locks.caseTypeName">
+        <em>WARNING: If any external files or programs reference the old "Name", then they must be updated manually.</em>
+      </div>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="description">
+        Description
+      </label>
+    </td>
+    <td>
+      <textarea name="description" ng-model="caseType.description" class="big crm-form-textarea"></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td class="label">
+      <label crm-ui-label crm-for="is_active">
+        Enabled?
+      </label>
+    </td>
+    <td>
+      <input name="is_active" type="checkbox" ng-model="caseType.is_active" ng-true-value="1" ng-false-value="0"/>
+    </td>
+  </tr>
+  </tbody>
+</table>

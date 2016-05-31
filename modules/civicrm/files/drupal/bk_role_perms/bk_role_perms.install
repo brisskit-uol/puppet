@@ -1,0 +1,194 @@
+<?php
+require_once ('bk_core_roles.inc');
+require_once ('bk_drupal_common.inc');
+
+function bk_role_perms_enable () {
+
+	/*
+	Check CiviCase is enabled, we cannot set Case related permissions if it is not.
+	*/
+	if (!civi_case_enabled()) {
+		drupal_set_message(t("CiviCase not enabled. Please enable CiviCase via CiviCRM Administer-> 'enable components' menu item first. Then disable and re-enable this module."), 'error');
+		return;
+	}
+    // Declare the roles we want and their perms
+
+    /*
+     * View All Contacts
+     */
+
+    $role_parms[]= array
+    (   
+        'name'=>BK_ACCESS_CIVICRM,
+        'permissions'=>array 
+        (
+         'administer blocks' => FALSE,	// Revoke permission
+         'access CiviCRM' => TRUE,	// Grant permission
+        )
+    );
+
+    /*
+     * Civi Case Edit All
+     */
+
+    $role_parms[]= array
+    (
+        'name'=>BK_CIVI_CASE_EDIT_ALL,
+        'permissions'=>array
+        (
+         'administer blocks' => FALSE, // Revoke permission
+         'add contacts' => TRUE, // Grant permission
+         'delete in CiviCase' => TRUE, // Grant permission
+         'access my cases and activities' => TRUE,	// Grant permission
+         'access all cases and activities' => TRUE,	// Grant permission
+         'add cases' => TRUE, // Grant permission
+        )
+    );
+
+    /*
+     * Civi Case View My
+     */
+
+    $role_parms[]= array
+    (
+        'name'=>BK_CIVI_CASE_EDIT_MY,
+        'permissions'=>array
+        (
+         'administer blocks' => FALSE, // Revoke permission
+         'add contacts' => TRUE,			// Grant permission
+         'delete in CiviCase' => TRUE,			// Grant permission
+         'access my cases and activities' => TRUE,	// Grant permission
+         'add cases' => TRUE, // Grant permission
+        )
+    );
+
+    /*
+     * Civi Case View All 
+     */
+
+    $role_parms[]= array
+    (
+        'name'=>BK_CIVI_CASE_VIEW_ALL,
+        'permissions'=>array
+        (
+         'administer blocks' => FALSE, // Revoke permission
+         'access my cases and activities' => TRUE,	// Grant permission
+         'access all cases and activities' => TRUE,	// Grant permission
+        )
+    );
+
+    /*
+     * Civi Case View My
+     */
+
+    $role_parms[]= array
+    (
+        'name'=>BK_CIVI_CASE_VIEW_MY,
+        'permissions'=>array
+        (
+         'administer blocks' => FALSE, // Revoke permission
+         'access my cases and activities' => TRUE, // Grant permission
+        )
+    );
+
+    /*
+     * Brisskit Administrator
+     */
+
+    $role_parms[]= array
+    (   
+        'name'=>BK_CIVI_BK_ADMIN,
+        'permissions'=>array 
+        (
+         'administer blocks' => FALSE, 		// Revoke permission
+         'access CiviCRM' => TRUE, 		// Grant permission
+         'add contacts' => TRUE, 		// Grant permission
+         'view all contacts' => TRUE,		// Grant permission
+         'edit all contacts' => TRUE,		// Grant permission
+         'view my contact' => TRUE,		// Grant permission
+         'edit my contact' => TRUE,		// Grant permission
+         'delete contacts' => TRUE,		// Grant permission
+         'access deleted contacts' => TRUE,	// Grant permission
+         'import contacts' => TRUE, 		// Grant permission
+         'edit groups' => TRUE, 		// Grant permission
+         'administer CiviCRM' => TRUE, 		// Grant permission
+         'skip IDS check' => TRUE, 		// Grant permission
+         'profile listings and forms' => TRUE,	// Grant permission
+         'profile listings' => TRUE, 		// Grant permission
+         'view all activities' => TRUE,		// Grant permission
+         'delete activities' => TRUE,		// Grant permission
+         'access Contact Dashboard' => TRUE,	// Grant permission
+         'translate CiviCRM' => TRUE,	// Grant permission
+         'administer reserved groups' => TRUE,	// Grant permission
+         'administer Tagsets' => TRUE,		// Grant permission
+         'administer reserved tags' => TRUE,	// Grant permission
+         'administer dedupe rules' => TRUE,	// Grant permission
+         'merge duplicate contacts' => TRUE,	// Grant permission
+         'view debug output' => TRUE,		// Grant permission
+         'view all notes' => TRUE,		// Grant permission
+         'access AJAX API' => TRUE,		// Grant permission
+         'access contact reference fields' => TRUE, // Grant permission
+         'create manual batch' => TRUE,		// Grant permission
+         'edit own manual batches' => TRUE,	// Grant permission
+         'edit all manual batches' => TRUE,	// Grant permission
+         'view own manual batches' => TRUE,	// Grant permission
+         'view all manual batches' => TRUE,	// Grant permission
+         'delete own manual batches' => TRUE,	// Grant permission
+         'delete all manual batches' => TRUE,	// Grant permission
+         'export own manual batches' => TRUE,	// Grant permission
+         'export all manual batches' => TRUE,	// Grant permission
+       )
+    );
+
+    foreach ($role_parms as $key=>$role_parm) {
+        create_roles_perms ($role_parm);
+    }
+/*
+    //3.  Add user
+    // Determine the roles of our new user
+    $new_user_roles = array(
+      DRUPAL_AUTHENTICATED_RID => 'authenticated user',
+      $bk_rid => TRUE,
+    );
+
+    // Create a new user
+    $new_user = new stdClass();
+    $new_user->name = 'receptionist02';
+    $new_user->pass = user_password(10);
+    $new_user->mail = 'receptionist@example.com';
+    $new_user->roles = $new_user_roles;
+    $new_user->status = 1; // omit this line to block this user at creation
+    $new_user->is_new = TRUE; // not necessary because we already omit $new_user->uid
+    user_save($new_user);
+*/
+}
+
+function create_roles_perms ($role_parm) {
+  //1.  Add the role
+    $role = new stdClass();
+    $role->name = $role_parm['name'];
+    // $role->weight = 10;
+    $check_role = user_role_load_by_name($role->name);
+    if (empty($check_role)) {
+        user_role_save($role);
+    }
+    else {
+        // Roles already exist and may have been edited locally, get out.
+	return;
+    }
+    //2.  Assign perms
+    // Role to grant the permissions to
+	if (user_role_load_by_name($role_parm['name'])) {
+		bk_drupal_audit ("Role exists".$role_parm['name']);
+		$bk_role = user_role_load_by_name($role_parm['name']);
+		$bk_rid = $bk_role->rid;
+		// Define our role permissions
+		$bk_permissions = $role_parm['permissions'];
+
+		// Grant permissions to our role
+		user_role_change_permissions($bk_rid, $bk_permissions);
+	}
+    else {
+		return;
+		}
+}

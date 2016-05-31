@@ -1,0 +1,28 @@
+Contains files that are modified versions of those provided with civi.
+
+copy_extension.php copies the files to their final location.
+
+Case.php
+========
+  Created by the script Case_patch.php
+
+  Different form original in that civicrm_case_type and civicrm_case table names have been replaced by brisskit-specific views. 
+
+DAO.php
+=======
+  Manually created
+
+  Amended so that when a DAO object is initialised, a mysql variable is set so the the brisskit-specific views pullback case types and cases filtered by component name.
+  Pull in BK_Utils.php and BK_Hooks.php to acheive this
+
+I18n.php
+========
+  Manually created
+
+  Amended to call the brisskit_ts() function which does word replacements appropriate to CiviStudy and CiviRecruitment.
+
+civi_settings.php 
+=================
+  Manually created
+  
+  Defines 2 constants used by our patched version of DAO.php, BK_EXTENSIONS_DIR and BK_HOOKS_DIR.

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<roles>
+  <role>
+     <name>ViewMyPatientsRole</name>
+     <label>ViewMyPatientsRole</label>
+     <description>Brisskit ACL role</description>
+     <groups>
+        <group>Receptionist Group</group>
+     </groups>
+  </role>
+  <role>
+     <name>ViewAllPatientsRole</name>
+     <label>ViewAllPatientsRole</label>
+     <description>Brisskit ACL role</description>
+     <groups>
+        <group>Receptionist Group</group>
+        <group>Administrator Group</group>
+        <group>Study Member Group</group>
+     </groups>
+  </role>
+</roles>
+

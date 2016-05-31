@@ -1,0 +1,49 @@
+<?php
+
+/**
+ * Implements hook_schema().
+ */
+function label_printer_schema() {
+  $schema['unique_ids'] =  array(
+
+    'description' => 'The table for used unique random IDs.',
+    'fields' => array(
+      'id' => array(
+        'description' => 'The table ID',
+        'type' => 'serial',
+        'not null' => TRUE),
+      'ordinal' => array(
+        'description' => 'The ordinal number from which the unque ID is created',
+        'type' => 'int',
+        'not null' => TRUE),
+      'prefix' => array(
+        'description' => 'The prefix',
+        'type' => 'varchar',
+        'length' => 16,
+        'not null' => TRUE),
+      'unique_id' => array(
+        'description' => 'The prefix',
+        'type' => 'int',
+        'not null' => TRUE),
+      'check_digit' => array(
+        'description' => 'The check digit',
+        'type' => 'varchar',
+        'length' => 1,
+        'not null' => TRUE),
+      'fullcode' => array(
+        'description' => 'The full code including prefix and check digit',
+        'type' => 'varchar',
+        'length' => 20,
+        'not null' => TRUE),
+      ),
+    'primary key' => array('id'),
+    'unique keys' => array(
+      'prefix_ordinal' => array('prefix', 'ordinal'),
+      'prefix_unique_id' => array('prefix', 'unique_id'),
+      'fullcode' => array('fullcode'),
+    ),
+  );
+
+  return $schema;
+}
+

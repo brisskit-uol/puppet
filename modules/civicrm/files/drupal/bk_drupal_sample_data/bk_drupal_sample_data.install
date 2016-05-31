@@ -1,0 +1,458 @@
+<?php
+/*
+Author:   Akriga Ltd
+Version:  1.0
+Purpose:  Demonstrate Brisskit roles & permissions by creating Drupal users with Brisskit roles.
+          Add CiviCRM contacts (only, not Drupal user) for testing.
+          NB Call to Drupal's user_save() function creates Civi contacts but the contacts are created without first & last names because these fields don't exist on the native Drupal user obj. 
+Depends:  Brisskit Roles & Permissions Drupal module.
+*/
+
+/*
+Check our dependency.
+Fetch array of users to be created and create each one.
+*/
+require_once (drupal_get_path('module', 'bk_role_perms').'/bk_core_roles.inc');
+require_once (drupal_get_path('module', 'bk_role_perms').'/bk_drupal_common.inc');
+
+function bk_drupal_sample_data_enable () {
+    // All of our roles should be present otherwise drupal user creation will fail 
+	if (!check_roles_present()) {
+		drupal_set_message(t("Brisskit roles missing, exiting because user creation will fail without roles. Disable and re-enable module Brisskit Roles & Permissions then enable this module."), 'error');
+		return;
+	}
+	/*
+	Check CiviCase is enabled, we cannot build upon Case related permissions if it is not.
+	*/
+	if (!civi_case_enabled()) {
+		drupal_set_message(t("CiviCase not enabled. Please enable CiviCase via CiviCRM Administer-> 'enable components' menu item first. Then disable and re-enable both Brisskit Roles & Permissions and this module."), 'error');
+		return;
+	}
+
+    // Load array of new Drupal user objects
+    $bk_users=load_sample_drupal_users ();
+    foreach ($bk_users as $bk_user) {
+        //Now create our example users.
+        create_user ($bk_user);
+    }
+
+    // Load array of new CiviCRM contact arrays
+    $bk_civicrm_contacts=load_sample_civicrm_contacts ();
+    foreach ($bk_civicrm_contacts as $bk_civicrm_contact) {
+        //Now create our example contacts.
+        create_civicrm_user ($bk_civicrm_contact);
+    }
+}
+
+/*
+Create Drupal user assigning Brisskit role(s).
+Inputs: object containing name, email address and role(s).
+Outputs: new role in Drupal user table, new contact in Civi contacts table (without name).
+*/
+function create_user ($bk_user) {
+
+    //Check if the user exists already
+    $existing_user = user_load_by_name($bk_user->name);
+    if($existing_user){
+        return;
+    }
+    // User doesn't exist, create a new user. Its not intended that anyone login with this user directly so we hash the password.
+    // Admins can reset the password to try out a users view of the data.
+    $new_user = new stdClass();
+    $new_user->name = $bk_user->name;
+    #$new_user->pass = user_password(10);
+    $new_user->pass = md5(user_password(10));
+    $new_user->mail = $bk_user->mail;
+    $new_user->roles = $bk_user->roles;
+    $new_user->status = 1; // omit this line to block this user at creation
+    $new_user->is_new = TRUE; // not necessary because we already omit $new_user->uid
+    user_save($new_user);
+
+}
+
+/*
+Create CiviCRM contact.
+Inputs: array containing name & email address.
+Outputs: new contact and new email in contact and email tables.
+*/
+function create_civicrm_user ($bk_civicrm_contact) {
+    //1. Init Civi.
+    if ( ! civicrm_initialize( ) ) {
+        bk_drupal_audit ("Failed to init Civi for user creation");
+        return;
+    }
+    //2. Create the contact
+    $result = civicrm_api3('Contact', 'create', array(
+      'sequential' => 1,
+      'contact_type' => "Individual",
+      'first_name' => $bk_civicrm_contact['first_name'],
+      'last_name' => $bk_civicrm_contact['last_name'],
+    ));
+
+    // Did that work?
+    if (($result['count']==1) 
+    && ($result['is_error']==0)) {
+        $contact_id= $result['values'][0]['id'];
+        bk_drupal_audit ("Created Civi contact id $contact_id");
+        
+        //3. Create corresponding email address
+        $result = civicrm_api3('Email', 'create', array(
+            'sequential' => 1,
+            'email' => $bk_civicrm_contact['email'],
+            'contact_id' => $contact_id,
+        ));
+        //4. Get the (optional) group id so that we can add the contact to any groups specified
+        if (!empty($bk_civicrm_contact['group_name'])) {
+            $group_id=get_group_id_by_name ($bk_civicrm_contact['group_name']);
+            if ($group_id>0) {
+                    $result = civicrm_api3('GroupContact', 'create', array(
+                    'sequential' => 1,
+                    'group_id' => $group_id,
+                    'contact_id' => $contact_id,
+                ));
+            }
+        }
+
+    }
+    else {
+        bk_drupal_audit ("Failed to create contact ".$bk_civicrm_contact['first_name']);
+    }
+
+
+}
+function get_group_id_by_name ($name) {
+  //1st get the group id
+  $result = civicrm_api3('Group', 'get', array(
+    'sequential' => 1,
+    'return' => "id",
+    'name' => $name,
+  ));
+  // Did that work?
+  if ($result['count']==1) {
+    $id=$result['values'][0]['id'];
+    if (!empty($id)) {
+      return $id;
+    }
+  } 
+  return FALSE;
+}
+
+/*
+Fetch array of users/contacts to be deleted and delete each one.
+*/
+function bk_drupal_sample_data_disable () {
+
+    // Load array of user objects
+    $bk_users=load_sample_drupal_users ();
+    foreach ($bk_users as $bk_user) {
+        delete_user ($bk_user);
+    }
+
+    // Load array of civicrm contacts
+    $bk_civicrm_contacts=load_sample_civicrm_contacts ();
+    foreach ($bk_civicrm_contacts as $bk_civicrm_contact) {
+        delete_contact ($bk_civicrm_contact);
+    }
+}
+
+/*
+Delete CiviCRM contacts.
+Inputs: array containing name & email address.
+Outputs: updated contact and email tables.
+*/
+function delete_contact ($bk_civicrm_contact) {
+    //1. Init Civi.
+    if ( ! civicrm_initialize( ) ) {
+        bk_drupal_audit ("Failed to init Civi for user creation");
+        return;
+    }
+    //2. Get the contact via its email
+    $result = civicrm_api3('Email', 'get', array(
+        'sequential' => 1,
+        'email' => $bk_civicrm_contact['email'],
+        'return' => 'contact_id, id',
+    ));
+ 
+    // Did that work?
+    if (($result['count']>=1) 
+    && ($result['is_error']==0)) {
+   //3. Get corresponding contact id
+        #$contact_id= $result['values'][0]['id'];
+        foreach ($result['values'] as $value) {
+            bk_drupal_audit ("Contact id for deletion:".$value['contact_id'].' email id for del '.$value['id']);
+            delete_civicrm_contact ($value['contact_id']);
+            delete_civicrm_email ($value['id']);
+        }
+    }
+    else {
+        bk_drupal_audit ("Failed to find contact for deletion:".$bk_civicrm_contact['first_name'].' email: '.$bk_civicrm_contact['email']);
+    }
+
+
+}
+/*
+Check user exists.
+Delete existing users on module disable so that we clean up after ourselves.
+*/
+function delete_user ($bk_user) {
+    //Check if the user exists
+    $existing_user = user_load_by_name($bk_user->name);
+    if(!$existing_user){
+        return;
+    }
+    // User does exist, delete the user
+    /*
+    Important! If you call Drupal's delete function, Civi's uf_match table entry for that user is also deleted but not the contact.
+    Consequently, you lose the link to the contact so that it cannot be deleted.
+    As a result you MUST delete the Civi contact first, then the Drupal user.
+    */    
+    delete_civicrm_contact_by_crm_id ($existing_user->uid);  // Whilst civicrm_uf_match still has an entry for this user.
+    user_delete($existing_user->uid);
+    bk_drupal_audit ("Del User uid.".$existing_user->uid.' with name '.$bk_user->name);
+
+}
+/*
+Delete Civi contact corresponding to our Drupal user.
+*/
+function delete_civicrm_contact_by_crm_id ($cms_id) {
+    //1. Init Civi.
+    if ( ! civicrm_initialize( ) ) {
+        bk_drupal_audit ("Failed to init Civi");
+        return;
+    }
+
+    //2. Get the contact_id via UF_Match
+    $result = civicrm_api3('UFMatch', 'get', array(
+      'sequential' => 1,
+      'return' => "contact_id",
+      'uf_id' => $cms_id,
+    ));
+
+    // Did that work?
+    if (($result['count']==1) 
+    && ($result['is_error']==0)) {
+        $contact_id= $result['values'][0]['contact_id'];
+        //3. Delete the contact.
+        delete_civicrm_contact ($contact_id);
+    }
+}
+
+/*
+Delete Civi contact using Civi contact ID
+*/
+function delete_civicrm_contact ($contact_id) {
+
+	/*
+	If we're called via disable we're not sure if the contact is there anymore, lets check.
+	*/
+    $result = civicrm_api3('Contact', 'get', array(
+        'sequential' => 1,
+        'id' => $contact_id,
+    ));
+
+    // Did that work?
+    if (($result['count']==1) 
+    && ($result['is_error']==0)) {
+		$result = civicrm_api3('Contact', 'delete', array(
+			'sequential' => 1,
+			'id' => $contact_id,
+			'skip_undelete' => 1,		// We want to permanently delete, not mark for trash.
+		));
+
+		// Did that work?
+		if (($result['count']==1) 
+		&& ($result['is_error']==0)) {
+			return;
+		}
+		else {
+			bk_drupal_audit ("02 Failed to delete civicrm contact id:".$contact_id);
+		}
+	}
+	else {
+			bk_drupal_audit ("01 Failed to delete civicrm contact id:".$contact_id);
+			}
+}
+
+/*
+Delete Civi email using email ID
+*/
+function delete_civicrm_email ($email_id) {
+	/*
+	Double check the email entity is still there to avoid errors reported to the user.   
+	*/
+    $result = civicrm_api3('Email', 'get', array(
+        'sequential' => 1,
+        'id' => $email_id,
+    ));
+
+
+    // Did that work?
+    if (($result['count']==1) 
+    && ($result['is_error']==0)) {
+		$result = civicrm_api3('Email', 'delete', array(
+			'sequential' => 1,
+			'id' => $email_id,
+		));
+
+		// Did that work?
+		if (($result['count']==1) 
+		&& ($result['is_error']==0)) {
+			return;
+		}
+		else {
+			bk_drupal_audit ("Failed to delete civicrm email id:".$email_id);
+		}
+	}
+}
+/*
+Build an array of Drupal users to be created/deleted.
+Each user consists of a name, email address and optional role(s) to be asigned.
+*/
+function load_sample_drupal_users () {
+
+    $bk_users = array();
+    // Create a new user obj
+    $bk_user = new stdClass();
+
+    //1.  Add 2x admin, no roles.
+    $bk_user->name = 'Ak Studyadministrator01';
+    $bk_user->mail = 'ak.studyadministrator01@example.com';
+    $bk_user->roles = array();
+    $bk_users[] = clone $bk_user;
+
+    $bk_user->name = 'Bk Studyadministrator02';
+    $bk_user->mail = 'bk.studyadministrator02@example.com';
+    $bk_user->roles = array();
+    $bk_users[] = clone $bk_user;
+
+    //2.  Add users with only simple roles next
+    // Determine the roles of our new user(s)
+
+	// Create vanilla objs
+    $bac_role 			= new stdClass();
+    $case_edit_my_role 	= new stdClass();
+    $case_view_my_role 	= new stdClass();
+
+	// Set Role IDs that Drupal expects
+	$bac_role->rid 			= set_rid (BK_ACCESS_CIVICRM);
+    $case_edit_my_role->rid = set_rid (BK_CIVI_CASE_EDIT_MY);
+    $case_view_my_role->rid = set_rid (BK_CIVI_CASE_VIEW_MY);
+
+	// Assign name to RID, now we have a fully formed role obj for drupals's user_save()
+    $new_user_roles = array(
+        $bac_role->rid => BK_ACCESS_CIVICRM,
+		$case_edit_my_role->rid => BK_CIVI_CASE_EDIT_MY,
+		$case_view_my_role->rid => BK_CIVI_CASE_VIEW_MY
+    );
+
+    // Add users with these roles.
+    $bk_user->name = 'Bk Nurse01';
+    $bk_user->mail = 'bk.nurse01@bkexample.com';
+    $bk_user->roles = $new_user_roles;
+    $bk_users[] = clone $bk_user;
+
+    $bk_user->name = 'Bk Receptionist01';
+    $bk_user->mail = 'bk.receptionist01@bkexample.com';
+    $bk_user->roles = $new_user_roles;
+    $bk_users[] = clone $bk_user;
+
+    $bk_user->name = 'Bk Studymember01';
+    $bk_user->mail = 'bk.studymember01@example.com';
+    $bk_user->roles = $new_user_roles;
+    $bk_users[] = clone $bk_user;
+
+
+    //3.  Finally users with additional roles 
+    // Determine the roles of our new user
+	
+	// Create additional vanilla objs
+    $case_edit_all_role = new stdClass();
+    $case_view_all_role = new stdClass();
+
+	// Set Role IDs that Drupal expects
+	$case_edit_my_role->rid = set_rid (BK_CIVI_CASE_EDIT_MY);
+	$case_view_my_role->rid = set_rid (BK_CIVI_CASE_VIEW_MY);
+	$case_edit_all_role->rid = set_rid (BK_CIVI_CASE_EDIT_ALL);
+	$case_view_all_role->rid = set_rid (BK_CIVI_CASE_VIEW_ALL);
+
+    unset($new_user_roles);
+
+	// Assign name to RID, now we have a fully formed role obj for drupals's user_save()
+    $new_user_roles = array(
+        $bac_role->rid => BK_ACCESS_CIVICRM,
+		$case_edit_my_role->rid => BK_CIVI_CASE_EDIT_MY,
+		$case_view_my_role->rid => BK_CIVI_CASE_VIEW_MY,
+		$case_edit_all_role->rid => BK_CIVI_CASE_EDIT_ALL,
+		$case_view_all_role->rid => BK_CIVI_CASE_VIEW_ALL
+    );
+
+    // Add users with these roles.
+    $bk_user->name = 'Bk Practicenurse01';
+    $bk_user->mail = 'bk.practicenurse01@example.com';
+    $bk_user->roles = $new_user_roles;
+    $bk_users[] = clone $bk_user;
+
+    return $bk_users;
+}
+function set_rid ($role_name) {
+	if (user_role_load_by_name($role_name)) {
+		$role = user_role_load_by_name($role_name);
+		return $role->rid;
+	}
+	else {
+		bk_drupal_audit ("Empty role for $role_name, role missing !");
+		return '';
+	}
+}
+
+/*
+User creation will fail if our roles are not present.  On enable (only) we check to see if they are
+present.  If not we advise the user to cycle the bk_role_perms module so that our roles are re-created.
+*/
+function check_roles_present () {
+	$bk_roles=get_all_roles();
+	$all_present=TRUE;
+	foreach ($bk_roles as $bk_role) {
+		if (!user_role_load_by_name($bk_role)) {
+			bk_drupal_audit ("Role $bk_role missing, set flag");
+			$all_present=FALSE;
+		}
+	}
+	return $all_present;
+}
+/*
+Build an array of Civi users to be created/deleted in Civi only.  These will NOT be created in Drupal.
+Each user consists of first name, last name, group and email address.
+*/
+function load_sample_civicrm_contacts () {
+
+    $bk_civi_users = array();
+    $bk_civi_users[]= array(
+                'first_name' => 'Andrea',                                                                                                          
+                'last_name'  => 'Patient',                                                                                                           
+                'group_name'      => 'Study A Group',    
+                'email'      => 'a.patient@study.a.com'                                                                                                               
+                            );     
+
+    $bk_civi_users[]= array(
+                'first_name' => 'Bettina',                                                                                                          
+                'last_name'  => 'Patient',          
+                'group_name'      => 'Study A Group',                                                                                                     
+                'email'      => 'b.patient@study.a.com'                                                                                                               
+                            );     
+
+    $bk_civi_users[]= array(
+                'first_name' => 'Catherine',                                                                                                          
+                'last_name'  => 'Patient',          
+                'group_name'      => 'Study B Group',                                                                                                     
+                'email'      => 'c.patient@study.b.com'                                                                                                               
+                            );     
+
+   $bk_civi_users[]= array(
+                'first_name' => 'Thomas',                                                                                                          
+                'last_name'  => 'Patient',                                                                                                           
+                'group_name'      => 'Study B Group',    
+                'email'      => 't.patient@study.b.com'                                                                                                               
+                            );     
+    return $bk_civi_users;
+}

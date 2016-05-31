@@ -1,0 +1,43 @@
+<?php
+include_once "lib/core.php";
+
+define('TISSUE_CONSENT','Consent to extract tissue');
+
+function brisskit_tissue_letter_response($params) {
+	if (!case_allows_activity($params['case_id'], TISSUE_CONSENT)) return;
+	
+	$case_id = $params['case_id'];
+	
+	$params = array(
+		'case_id' => $params['case_id'],
+		'activity_type' => TISSUE_CONSENT, 
+		'subject' => POSITIVE_REPLY_SUBJECT, 
+		'status' => ACT_STATUS_PENDING,
+		'creator_id' => $params['source_contact_id']
+	);
+	add_activity_to_case($params);
+	drupal_set_message("'".TISSUE_CONSENT."' activity added to case");
+	return true;
+}
+
+#hook run when consent set to 'Accepted' for tissue extraction
+# 3. scheduled ÔBRISSkit data transferÕ to integrate with catissue
+function brisskit_tissue_consent_success($activity_type,$params) {
+	if ($activity_type == TISSUE_CONSENT) { 
+		$case_id = $params['case_id'];
+		$case_contact = get_case_contact_with_custom_values($case_id);
+		$contact = get_contact($case_contact['contact_id']);
+		
+		drupal_set_message("Data transfer to caTissue is pending");
+		$params = array(
+			'case_id' => $params['case_id'],
+			'activity_type'=>ACTIVITY_DATA_TRANSFER,
+			'subject' => "Transfer to caTissue",
+			'status' => "Scheduled",
+			'creator_id' => $params['source_contact_id']
+		);
+
+		add_activity_to_case($params);
+		return true;
+	}
+}

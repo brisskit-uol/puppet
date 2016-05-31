@@ -1,0 +1,34 @@
+<?php
+
+define('DATACOL_CONSENT','Consent to collect data');
+define('APPOINTMENT','Phone Call');
+
+function brisskit_datacol_letter_response($params) {
+	$case_id = $params['case_id'];
+	
+	$params = array(
+		'case_id' => $params['case_id'],
+		'activity_type' => DATACOL_CONSENT, 
+		'subject' => POSITIVE_REPLY_SUBJECT, 
+		'status' => ACT_STATUS_PENDING,
+		'creator_id' => $params['source_contact_id']
+	);
+	add_activity_to_case($params);
+	drupal_set_message("'".DATACOL_CONSENT."' activity added to case");
+	return true;
+}
+
+#hook run when consent set to 'Accepted' for data collection
+function brisskit_datacol_consent_success($activity_type,$params) {
+	if ($activity_type == DATACOL_CONSENT) { 
+		$params = array('case_id' => $params['case_id'],
+						'creator_id' => $params['source_contact_id'], 
+						'activity_type' => APPOINTMENT, 
+						'subject' => "Organise data collection appointment with participant", 
+						'status' => ACT_STATUS_SCHEDULED);
+		
+		# 3. the addition of a task to ÔBook an appointment to meet with the participantÕ -> this is completely manual 
+		add_activity_to_case($params);
+		return true;
+	}
+}

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<groups>
+  <group>
+     <name>Administrator Group</name>
+     <title>Administrator Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+  <group>
+     <name>Practice Nurse Group</name>
+     <title>Practice Nurse Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+  <group>
+     <name>Nurse Group</name>
+     <title>Nurse Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+  <group> 
+     <name>Receptionist Group</name>
+     <title>Receptionist Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+  <group>
+     <name>Study A Group</name>
+     <title>Study A Group</title>
+     <description>Patients in Study A group</description>
+  </group>
+  <group> 
+     <name>Study B Group</name>
+     <title>Study B Group</title>
+     <description>Patients in Study B group</description>
+  </group>
+  <group>
+     <name>Study Administrator Group</name>  
+     <title>Study Administrator Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+  <group>
+     <name>Study Member Group</name>
+     <title>Study Member Group</title>
+     <description>Brisskit ACL group</description>
+  </group>
+
+</groups>
+

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+<acls>
+  <acl>
+     <name>Brisskit View All Patients</name>
+     <role>ViewAllPatientsRole</role>
+     <description>Brisskit ACL role</description>
+     <operation>View</operation>
+     <group>Study A Group</group>
+  </acl>
+  <acl>
+     <name>Brisskit View My Patients</name>
+     <role>ViewMyPatientsRole</role>
+     <description>Brisskit ACL role</description>
+     <operation>View</operation>
+     <group>Study A Group</group>
+  </acl>
+</acls>
+

@@ -1,0 +1,127 @@
+<?php
+
+require_once("IdGenerator.php");
+
+/**
+ * Implements hook_menu().
+ */
+function label_printer_menu() {
+  $items = array();
+  $items['admin/config/content/label_printer'] = array(
+    'title' => 'Label Printer',
+    'description' => 'Prints study labels',
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('_label_printer_config'),
+    'access arguments' => array('access administration pages'),
+    'type' => MENU_NORMAL_ITEM,
+  );
+
+  return $items;
+}
+
+/**
+ * Page callback: label printing settings
+ *
+ * @see label_printer_menu()
+ */
+function _label_printer_config($form, &$form_state) {
+
+  $form['label_printer_hostname_sample_printer'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Sample Printer Host Name'),
+    '#default_value' => _label_printer_sample_hostname(),
+    '#size' => 15,
+    '#maxlength' => 15,
+    '#description' => t('The Host Name or IP address of the printer to be the destination for the labels.'),
+    '#required' => TRUE,
+  );
+
+  $form['label_printer_port_sample_printer'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Sample Printer port'),
+    '#default_value' => _label_printer_sample_port(),
+    '#size' => 4,
+    '#maxlength' => 5,
+    '#description' => t('The port on the printer listening for the print instruction set.'),
+    '#required' => TRUE,
+  );
+
+  $form['label_printer_hostname_bag_printer'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Bag Printer Host Name'),
+    '#default_value' => _label_printer_bag_hostname(),
+    '#size' => 15,
+    '#maxlength' => 15,
+    '#description' => t('The Host Name or IP address of the printer to be the destination for the labels.'),
+    '#required' => TRUE,
+  );
+
+  $form['label_printer_port_bag_printer'] = array(
+    '#type' => 'textfield',
+    '#title' => t('Bag Printer port'),
+    '#default_value' => _label_printer_bag_port(),
+    '#size' => 4,
+    '#maxlength' => 5,
+    '#description' => t('The port on the printer listening for the print instruction set.'),
+    '#required' => TRUE,
+  );
+
+  return system_settings_form($form);
+}
+
+function _label_printer_sample_hostname() {
+    return variable_get('label_printer_hostname_sample_printer', '125.200.4.45');
+}
+
+function _label_printer_sample_port() {
+    return variable_get('label_printer_port_sample_printer', 9100);
+}
+
+function _label_printer_bag_hostname() {
+    return variable_get('label_printer_hostname_bag_printer', '125.200.4.46');
+}
+
+function _label_printer_bag_port() {
+    return variable_get('label_printer_port_bag_printer', 9100);
+}
+
+function label_printer_print_samples($id, $studyName) {
+    _label_printer_print_template($id, $studyName, 'SampleLabel.zpl', _label_printer_sample_hostname(), _label_printer_sample_port());
+}
+
+function label_printer_print_bags($id, $studyName) {
+    _label_printer_print_template($id, $studyName, 'BagLabel.zpl', _label_printer_bag_hostname(), _label_printer_bag_port());
+}
+
+function _label_printer_print_template($id, $studyName, $templateFile, $hostname, $port) {
+
+    $templateContent = file_get_contents(drupal_get_path('module','label_printer') . '/' . $templateFile);
+
+    if (!$templateContent) {
+        form_set_error('',t('Unable to read labels template file: @template_ref',array('@template_ref' => $templateContent)));
+        return;
+    }
+
+    try {
+        $socket = open_socket($hostname, $port);
+
+        $label = str_replace(array('{ID_PLACEHOLDER}', '{STUDY_PLACEHOLDER}'),array($id, $studyName),$templateContent);
+
+        if(!socket_send ($socket, $label, strlen($label) , 0)) {
+            $errorcode = socket_last_error();
+            $errormsg = socket_strerror($errorcode);
+            throw new Exception("Could not send data to labels printer: [$errorcode] $errormsg \n");
+        } 
+
+        socket_close($socket);
+
+      } catch(exception $e) {
+
+        if (isset($socket)) {
+          socket_close($socket);
+        }
+        throw $e;
+      }
+
+    usleep(250000);
+}

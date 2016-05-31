@@ -1,0 +1,5 @@
+
+/* Remove display of Cases nav item. There's probably a nice way to do this but we couldn't get it to work in the civi backend Administer -> Customise Data and Screens -> Navigation Menu */
+.menumain.crm-Cases {
+  display: none;
+}

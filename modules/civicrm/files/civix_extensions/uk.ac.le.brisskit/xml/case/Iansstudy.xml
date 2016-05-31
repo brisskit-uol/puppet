@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<CaseType>
+  <name>Iansstudy</name>
+  <ActivityTypes>
+    <ActivityType>
+      <name>Open Case</name>
+      <max_instances>1</max_instances>
+    </ActivityType>
+    <ActivityType>
+      <name>Check participant status</name>
+    </ActivityType>
+    <ActivityType>
+      <name>Consent to collect data</name>
+      <status>Pending</status>
+    </ActivityType>
+    <ActivityType>
+      <name>Consent to extract tissue</name>
+      <status>Pending</status>
+    </ActivityType>
+    <ActivityType>
+      <name>Consent to use information</name>
+      <status>Pending</status>
+    </ActivityType>
+    <ActivityType>
+      <name>BRISSkit data transfer</name>
+      <status>Scheduled</status>
+    </ActivityType>
+    <ActivityType>
+      <name>Phone Call</name>
+      <status>Scheduled</status>
+    </ActivityType>
+    <ActivityType>
+      <name>Print PDF Letter</name>
+      <status>Scheduled</status>
+    </ActivityType>
+    <ActivityType>
+      <name>Positive reply received</name>
+      <status>Scheduled</status>
+    </ActivityType>
+  </ActivityTypes>
+  <ActivitySets>
+    <ActivitySet>
+      <name>standard_timeline</name>
+      <label>Initial check</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Open Case</name>
+          <status>Completed</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Check participant status</name>
+          <status>Scheduled</status>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+    <ActivitySet>
+      <name>contact_participant</name>
+      <label>Contact participant</label>
+      <timeline>true</timeline>
+      <ActivityTypes>
+        <ActivityType>
+          <name>Print PDF Letter</name>
+          <status>Scheduled</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Email</name>
+          <status>Scheduled</status>
+        </ActivityType>
+        <ActivityType>
+          <name>Positive reply received</name>
+          <status>Scheduled</status>
+        </ActivityType>
+      </ActivityTypes>
+    </ActivitySet>
+  </ActivitySets>
+  <CaseRoles>
+    <RelationshipType>
+        <name>Participant</name>
+    </RelationshipType>	  
+ </CaseRoles>
+</CaseType>

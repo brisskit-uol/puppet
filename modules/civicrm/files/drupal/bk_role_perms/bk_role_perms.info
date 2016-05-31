@@ -1,0 +1,3 @@
+name = Brisskit Roles & Permissions
+description = Setup roles and permissions for Brisskit.
+core = 7.x

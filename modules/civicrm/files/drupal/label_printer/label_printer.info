@@ -1,0 +1,4 @@
+name = Label Printer
+description = Prints study labels.
+core = 7.x
+configure = admin/config/content/label_printer
