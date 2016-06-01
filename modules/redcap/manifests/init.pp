@@ -1,4 +1,4 @@
-class redcap {
+class redcap { 
 
 	class { '::ruby':
 		gems_version  => 'latest',
