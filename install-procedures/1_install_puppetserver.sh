@@ -16,8 +16,8 @@ exec >> $TMPDIR/install-$(date +"%F-%H%M%S").log 2>&1
 
 # Download and install package to add Puppet repository
 echo "***LOG:*** Downloading Puppet repository package"
-wget -P $TMPDIR https://apt.puppetlabs.com/puppetlabs-release-pc1-trusty.deb
-sudo dpkg -i $TMPDIR/puppetlabs-release-pc1-trusty.deb
+wget -P $TMPDIR https://apt.puppetlabs.com/puppetlabs-release-trusty.deb
+sudo dpkg -i $TMPDIR/puppetlabs-release-trusty.deb
 
 # Refresh repositories
 echo "***LOG:*** Refreshing repositories"
