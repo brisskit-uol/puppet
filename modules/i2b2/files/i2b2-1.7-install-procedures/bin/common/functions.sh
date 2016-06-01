@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Common Functions
+# Common Functions 
 #
 # Invocation within another shell script should be
 # source ${I2B2_INSTALL_PROCS_HOME}/bin/common/functions.sh

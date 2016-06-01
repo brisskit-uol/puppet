@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Basic environment variables for i2b2
+# Basic environment variables for i2b2 1.7
 # 
 # Invocation within another sh script should be:
 # source $I2B2_INSTALL_PROCS_HOME/bin/common/setenv.sh

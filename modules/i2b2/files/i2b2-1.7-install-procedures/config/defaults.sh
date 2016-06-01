@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Default settings used by scripts within the bin directory
+# Default settings used by scripts within the bin directory 
 # 
 #-------------------------------------------------------------------
 
@@ -33,7 +33,6 @@ export MVN_DEPLOY_PASSWORD=readonly.....
 
 # Acquisition paths.
 # Intermediate environment variable BMN points to the Brisskit Maven instance of Nexus
-#BMN=http://www.h2ss.co.uk/q/i2b2pg
 BMN=https://catissue.crb.le.ac.uk/i2b2pg
 export JDK_DOWNLOAD_PATH=${BMN}/jdk-7u17-linux-x64.tar.gz
 export ANT_DOWNLOAD_PATH=${BMN}/apache-ant-1.8.4-bin.zip

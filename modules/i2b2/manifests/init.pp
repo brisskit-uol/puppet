@@ -1,4 +1,4 @@
-class i2b2 {
+class i2b2 { 
 	
 	class { '::ruby':
 		gems_version  => 'latest',
